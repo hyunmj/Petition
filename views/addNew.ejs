@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>게시판</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+	<div class="write_form_title">
+		<h1>청원하기</h1>
+	</div>
+	<div class="write_form">
+        <form id="writeAction" action="/boards/add" method="post">
+            <input type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
+            <input type="text" action="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+            <input type="text" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
+            <div class="select_to">
+                <select name="to">
+                    <%for(var i=0;i < tos.length;i++) {%>
+                    <option value="<%=tos[i]._id%>"><%=tos[i].name%></option>
+                    <% }%> 
+                </select>
+            </div>
+            <div class="select_category">
+                <select name="category">
+                    <%for(var i=0;i < categories.length;i++) {%>
+                    <option value="<%=categories[i]._id%>"><%=categories[i].name%></option>
+                    <% }%>
+                </select>
+            </div>
+            <textarea class="textContents" id="addContents" name="addContents" rows="20" cols="80"></textarea>
+        </form>
+        <div id="new" class="addBtngroup">
+            <button onclick="submitContents('add');">
+                <div>SUBMIT</div>
+            </button>
+            <button onclick="javascript:history.back();">
+                <div>CANCEL</div>
+            </button>
+        </div>
+    </div>
+</body>
+<script>
+	function submitContents(option) {
+        var title = $('#addContentSubject').val();
+        var content = $('#addContents').val();
+        var writer = $('#addContentWriter').val();
+        var password = $('#addContentPassword').val();
+
+        if (option == 'add') {
+            if (title == '' || content == '' || writer == '' || password == '') {
+                alert("제목, 내용, 작성자, 비밀번호 모두 입력하세요.");
+                return;
+            } else {
+                $('#writeAction').submit();
+            }
+        }
+    }
+</script>
+</html>

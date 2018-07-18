@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>대상별 청원</title>
+  <link rel="stylesheet" href="/stylesheets/style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+	<div class="head">
+	  	<div class="title">
+	    <h1 style="text-align:center;">청원 및 제안</h1>
+	    </div>
+	    <div>
+	    <h2 style="text-align:center;">
+	        <a href="/boards/?order=new">최신순</a>
+	        <a href="/boards/?order=best">추천순</a>
+	        <a href="/boards/category?c=0&order=new">분야별 청원</a>
+	        <a style="color:#104e8b;" href="/boards/to?t=0&order=new">대상별 청원</a>
+	        <a>답변된 청원</a>
+	    </h2>
+	    </div>
+	</div>
+	<hr>
+	<div class="write_now">
+		<h2>청원 작성하기</h2>
+		<div>
+		청와대의 직접 소통은 국민이 물으면 정부가 답한다 는 철학을 지향합니다. 국정 현안 관련, 국민들 다수의 목소리가 모여 30일 동안 20만 명 이상의 국민들이 추천한 청원에 대해서는 정부 및 청와대 관계자(각 부처 장관, 대통령 수석 비서관, 특별보좌관 등)가 답하겠습니다.
+		</div>
+		<br>
+		<div class="write_btn">
+	        <form action="/boards/addNew" method="get">
+	            <input type="submit" value="지금 청원하기">
+	        </form>
+    	</div>
+    </div>
+  <hr>
+  <h2>
+  	청원 대상별 보기
+  </h2>
+  <div class="to_area">
+      <ul>
+          <li>
+              <a href="/boards/to?t=0&order=new">전체</a>
+          </li>
+          <%for(var i=0;i < tos.length;i++) {%>
+              <li>
+                  <a href="/boards/to?t=<%=tos[i]._id%>&order=new%>">
+                      <%=tos[i].name%>
+                  </a>
+              </li>
+          <%}%>
+      </ul>
+  </div>
+  <hr>
+  <div class="TOP5">
+  	<div class="TOP5_title">
+	  <h2>
+	  	<%=tName%> 추천순 TOP5
+	  </h2>
+	  <div class="list_all">
+		<div class="list_TOP5">
+	  <table>
+	      <tr>
+	          <th>No.</th>
+	          <th>제목</th>
+	          <th>작성자</th>
+	          <th>작성 날짜</th>
+	          <th>조회수</th>
+	          <th>청원동의</th>
+	          <th>분류</th>
+	          <th>대상</th>
+	      </tr>
+	      <%if(contents.length>0){%>
+	      	<%var best_contents = contents.slice(); %>
+	      	<%best_contents.sort(function(a, b){%>
+	      	<%	return a.ncomments>b.ncomments ? -1 : a.ncomments < b.ncomments ? 1 : 0;%>
+	      	<%});%>
+            <%for(var i=0;i < best_contents.length;i++) {%>
+            <tr>
+                <td class="number">
+                    <%=i+1%>
+                </td>
+                <td class="title">
+                    <a href="/boards/view?id=<%=best_contents[i]._id%>&search=0">
+                        <%=best_contents[i].title%>
+                    </a>
+                </td>
+                <td class="writer">
+                    <%=best_contents[i].writer%>
+                </td>
+                <td class="date">
+                    <%=dateFormatChange(best_contents[i].date)%>~<%=dateFormatChange(best_contents[i].endDate)%>
+                </td>
+                <td class="cnt">
+                    <%=best_contents[i].count%>
+                </td>
+                <td class="hope">
+                    <%=best_contents[i].comments.length%>명
+                </td>
+                <td class="category">
+                    <%=best_contents[i].category.name%>
+                </td>
+                <td class="to">
+                    <%=best_contents[i].to.name%>
+                </td>
+            </tr>
+            <%if(i==4) {%>
+            <% break;%>
+            <%}%>
+            <%}%>
+          	<%} else {%>
+            <tr>
+                <td colspan="5">게시물이 없습니다.</td>
+            </tr>
+            <%}%>
+	  </table>
+	</div>
+	</div>
+	</div>
+	<hr>
+	<div class="list_all">
+		<h2><%=tName%> 목록</h2>
+		<h3>
+			<a href="/boards/to?t=<%=tNum%>&order=new">최신순보기</a>
+			<a href="/boards/to?t=<%=tNum%>&order=best">추천순보기</a>
+		</h3>
+	  <table>
+	      <tr>
+	          <th>No.</th>
+	          <th>제목</th>
+	          <th>작성자</th>
+	          <th>작성 날짜</th>
+	          <th>조회수</th>
+	          <th>청원동의</th>
+	          <th>분류</th>
+	          <th>대상</th>
+	      </tr>
+	      <%if(contents.length>0){%>
+	          <%var i = 0;%>
+	              <%contents.forEach(function(item){%>
+	                  <%i++;%>
+	                      <tr>
+	                          <td class="number">
+	                              <%=i%>
+	                          </td>
+	                          <td class="title">
+	                              <a href="/boards/view?id=<%=item._id%>&search=0">
+	                                  <%=item.title%>
+	                              </a>
+	                          </td>
+	                          <td class="writer">
+	                              <%=item.writer%>
+	                          </td>
+	                          <td class="date">
+	                              <%=dateFormatChange(item.date)%>~<%=dateFormatChange(item.endDate)%>
+	                          </td>
+	                          <td class="cnt">
+	                              <%=item.count%>
+	                          </td>
+	                          <td class="hope">
+	                              <%=item.comments.length%>명
+	                          </td>
+	                          <td class="category">
+	                              <%=item.category.name%>
+	                          </td>
+	                          <td class="to">
+	                              <%=item.to.name%>
+	                          </td>
+	                      </tr>
+	                      <%})%>
+	                          <%} else {%>
+	                              <tr>
+	                                  <td colspan="5">게시물이 없습니다.</td>
+	                              </tr>
+	                              <%}%>
+	  </table>
+	</div>
+</body>
+
+</html>
+
+<%
+function dateFormatChange(date) {
+var yyyy = date.getFullYear();
+var MM = date.getMonth()+1;
+var dd = date.getDate();
+
+return yyyy+"."+MM+"."+dd;
+}
+%>

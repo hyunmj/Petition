@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta chaset="utf-8">
+	<title>수정하기</title>
+	<link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+	<h1>수정하기</h1>
+	<div class="modify_form">
+    <form id="modifyAction" action="/boards/modify" method="post">
+      <input type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
+      <input type="text" class="inputPassword" id="modContentPassword" name="modContentPassword" placeholder="비밀번호">
+      <span class="modWriter" id="modContentWriter" name="modContentWriter"></span>
+      <div class="modify_to">
+      <select name="modTo" id="modTo">
+          <%for(var i=0;i < tos.length;i++) {%>
+              <option value="<%=tos[i]._id%>">
+                  <%=tos[i].name%>
+              </option>
+              <% }%>
+      </select>
+  	  </div>
+  	  <div class="modify_category">
+      <select name="modCategory" id="modCategory">
+          <%for(var i=0;i < categories.length;i++) {%>
+              <option value="<%=categories[i]._id%>">
+                  <%=categories[i].name%>
+              </option>
+              <% }%>
+      </select>
+  	  </div>
+  	  <textarea class="textContents" id="modContents" name="modContents" rows="20" cols="80"></textarea>
+      <input type="hidden" id="modId" name="modId" value="<%=content._id%>">
+    </form>
+    <script>
+    	modifyContents();
+    </script>
+    <div class="addBtngroup" style="margin-left:520px;">
+      <button onclick="modifySubmitContents();">수정</button>
+      <button onclick="location.href='/boards/view?id=<%=content._id%>'">취소</button>
+    </div>
+  </div>
+
+  <script>
+  	window.onload = modifyContents();
+
+	function modifySubmitContents() {
+	  var title=$('#modContentSubject').val();
+	  var content=$('#modContents').val();
+	  var inputPassword=$('#modContentPassword').val();
+
+	  var chkpw=checkPW(inputPassword);
+
+	  if(chkpw==true) {
+	    if(title==''||content=='') {
+	      alert("제목과 내용이 모두 있어야 합니다.");
+	      return;
+	    } else {
+	      $('#modifyAction').submit();
+	    }
+	  } else {
+	    alert('비밀번호가 틀렸습니다.');
+	    return;
+	  }
+	}
+
+
+	function checkPW(inputPassword) {
+	  var result='';
+
+	  $.ajax({
+	    url:'/boards/password/?id=<%=content._id%>',
+	    async:false,
+	    success: function(password) {
+	      if(inputPassword==password) result=true;
+	      else result=false;
+	    }
+	  });
+	  return result;
+	}
+
+
+	function modifyContents() {
+	  $('.modify_form').show();
+
+	  $('.modSubject').val('<%=content.title%>');
+	  $('.modWriter').text('<%=content.writer%>');
+	  $('.textContents').html('<%=content.contents%>');
+	  $('#modTo').val('<%=content.to._id%>');
+	  $('#modCategory').val('<%=content.category._id%>')
+	}
+</script>
+</body>
+</html>

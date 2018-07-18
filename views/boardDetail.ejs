@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>게시판</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div class="content_box">
+    <h1>청원 내용</h1>
+    <hr>
+    <div class="content-info">
+      <div class="content-title">
+        <strong>제목 </strong><%=content.title%>
+      </div>
+      <div class="content-date">
+      <span><strong>청원기간 </strong></span><%=dateFormatChange(content.date)%>~<%=dateFormatChange(content.endDate)%>
+      </div>
+      <div class="writer">
+      <strong>작성자 </strong><%=content.writer%>
+      </div>
+    </div>
+    <div class="to-info">
+      <strong>청원대상 </strong><%=content.to.name%>
+    </div>
+    <div class="category-info">
+      <strong>분류 </strong><%=content.category.name%>
+    </div>
+    <p>
+    <div class="content-text">
+      <%=content.contents%>
+    </div>
+    </p>
+    <a href="/boards/mod?id=<%=content._id%>">수정</a>
+    <a href="javascript:void(0);" onclick="deleteContents();">삭제</a>
+    <a href="/boards"><span class="content-Btn">목록으로~</span></a>
+    <hr>
+    <% if (locals.search_flag&&search_flag==1) { %>
+    <a href="javascript:history.back();">검색 결과로 돌아가기</a>
+    <% } %>
+  </div>
+  <div class="num_of_hope">
+    <h3>청원동의 <%=content.comments.length%>명</h3>
+  </div>
+
+  <div class="add_comment_form">
+    <form id="addCommentAction" action="/boards/comment" method="post">
+      <textarea class="commentMemo" id="commentMemo" name="commentMemo" placeholder="동의합니다." rows="5" cols="30"></textarea>
+      <input type="hidden" name="contentId" value="<%=content._id%>">
+      <button onclick="addComment();">동의하기</button>
+    </form>
+  </div>
+
+
+  <div class="comment_list">
+    <table>
+      <%if (content.comments) {%>
+      <% var commentList = content.comments;%>
+      <% for(var i=0;i < commentList.length;i++) {%>
+      <tr>
+        <td><%=commentList[i].writer%></td>
+        <td><%=commentList[i].memo%></td>
+        <td><%=dateFormatChange(commentList[i].date)%></td>
+      </tr>
+      <%}%>
+      <%}%>
+    </table>
+  </div>
+
+  <div class="delete_confirm" style="display:none;">
+    <h1>비밀번호를 입력하면 글이 삭제됩니다.</h1>
+    <input type="password" id="delPassword" name="delPassword">
+    <button onclick="deleteConfirm();">삭제</button>
+    <button onclick="cancelForm('delete');">취소</button>
+  </div>
+
+<script>
+
+
+function addComment() {
+  var memo = $('#commentMemo').val();
+  if(memo=='') {
+    $('#commentMemo').val('동의합니다.');
+  }
+    $('#addCommentAction').submit();
+}
+
+
+function deleteContents() {
+  $(".delete_confirm").show();
+}
+
+
+function deleteConfirm() {
+  var inputPassword=$('#delPassword').val();
+  var chpw=checkPW(inputPassword);
+
+  if(chpw==true) {
+    location.href='/boards/delete?id=<%=content._id%>';
+  } else {
+    alert('비밀번호가 틀렸습니다.');
+  }
+}
+
+
+function checkPW(inputPassword) {
+  var result='';
+
+  $.ajax({
+    url:'/boards/password/?id=<%=content._id%>',
+    async:false,
+    success: function(password) {
+      if(inputPassword==password) result=true;
+      else result=false;
+    }
+  });
+  return result;
+}
+
+
+</script>
+</body>
+</html>
+
+<%
+function dateFormatChange(date) {
+var yyyy = date.getFullYear();
+var MM = date.getMonth()+1;
+var dd = date.getDate();
+
+return yyyy+"."+MM+"."+dd;
+}
+%>

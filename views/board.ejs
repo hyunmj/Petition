@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>게시판</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="title">
+    <h1 style="text-align:center;">청원 및 제안</h1>
+    </div>
+    <div>
+    <h2 style="text-align:center;">
+        <%if(order=='new') {%>
+        <a href="/boards/?order=new" style="color:#104e8b;">최신순</a>
+        <a href="/boards/?order=best">추천순</a>
+        <%} else {%>
+        <a href="/boards/?order=new">최신순</a>
+        <a href="/boards/?order=best" style="color:#104e8b;">추천순</a>
+        <%}%>
+        <a href="/boards/category?c=0&order=new">분야별 청원</a>
+        <a href="/boards/to?t=0&order=new">대상별 청원</a>
+        <a>답변된 청원</a>
+    </h2>
+    </div>
+    <hr>
+    <div class="best_petition">
+        <div class="best_petition_title">
+            <h2>최다 추천 청원</h2>
+        </div>
+        <div class="best_petition_content">
+            <h3><a style="color:black" href="/boards/view?id=<%=bestPetition._id%>"><%=bestPetition.title%></a></h3>
+            <p><%=bestPetition.contents%></p>
+            <ul class="best_petition_info" style="list-style: none;">
+                <li>
+                    <strong>청원인</strong>
+                    <span><%=bestPetition.writer%></span>
+                </li>
+                <li>
+                    <strong>참여인원</strong>
+                    <span><%=bestPetition.ncomments%></span>
+                </li>
+                <li>
+                    <strong>청원기간</strong>
+                    <span><%=dateFormatChange(bestPetition.date)%>~<%=dateFormatChange(bestPetition.endDate)%></span>
+                </li>
+            </ul>
+            <div class="detail_btn">
+                <a href="/boards/view?id=<%=bestPetition._id%>">내용 자세히 보기</a>
+            </div>
+        </div> 
+    </div>
+    <hr>
+    <div class="write_now">
+        <h2>청원 작성하기</h2>
+        <div>
+        청와대의 직접 소통은 국민이 물으면 정부가 답한다 는 철학을 지향합니다. 국정 현안 관련, 국민들 다수의 목소리가 모여 30일 동안 20만 명 이상의 국민들이 추천한 청원에 대해서는 정부 및 청와대 관계자(각 부처 장관, 대통령 수석 비서관, 특별보좌관 등)가 답하겠습니다.
+        </div>
+        <br>
+        <div class="write_btn">
+            <form action="/boards/addNew" method="get">
+                <input type="submit" value="지금 청원하기">
+            </form>
+        </div>
+    </div>
+    <hr>
+    <div class="waiting_petition">
+        <div class="waiting_petition_title">
+            <h2>답변 대기 중인 청원</h2>
+        </div>
+    </div>
+    <hr>
+
+    <div class="list_all">
+        <h2>청원 목록</h2>
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>청원기간</th>
+                <th>조회수</th>
+                <th>청원동의</th>
+                <th>분류</th>
+                <th>대상</th>
+            </tr>
+            <%if(contents.length>0){%>
+                <%var i = 0;%>
+                <%contents.forEach(function(item){%>
+                <%i++;%>
+                <tr>
+                <td class="number">
+                    <%=i%>
+                </td>
+                <td class="title">
+                    <a href="/boards/view?id=<%=item._id%>&search=0">
+                        <%=item.title%>
+                    </a>
+                </td>
+                <td class="writer">
+                    <%=item.writer%>
+                </td>
+                <td class="date">
+                    <%=dateFormatChange(item.date)%>~<%=dateFormatChange(item.endDate)%>
+                </td>
+                <td class="cnt">
+                    <%=item.count%>
+                </td>
+                <td class="hope">
+                    <%=item.comments.length%>명
+                </td>
+                <td class="category">
+                    <%=item.category.name%>
+                </td>
+                <td class="to">
+                    <%=item.to.name%>
+                </td>
+
+                </tr>
+                <%})%>
+                <%} else {%>
+                    <tr>
+                        <td colspan="5">게시물이 없습니다.</td>
+                    </tr>
+                <%}%>
+        </table>
+    </div>
+    <p>
+    <div class="search_form" style="margin-right:0px;">
+        <form id="searchAction" action="/boards/search" method="post">
+            <input type="text" class="searchText" id="searchText" name="searchText" placeholder="검색어">
+            <button onclick="search();">검색</button>
+        </form>
+    </div>
+    </p>
+
+    <div class="write_btn">
+        <form action="/boards/addNew" method="get">
+            <input type="submit" value="청원하기">
+        </form>
+    </div>
+
+    <div class="write_form" style="display:none;">
+        <form id="writeAction" action="/boards/add" method="post">
+            <input type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
+            <input type="text" action="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+            <input type="text" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
+            
+            <div class="select_to">
+                <select name="to">
+                    <%for(var i=0;i < tos.length;i++) {%>
+                    <option value="<%=tos[i]._id%>"><%=tos[i].name%></option>
+                    <% }%> 
+                </select>
+            </div>
+            <div class="select_category">
+                <select name="category">
+                    <%for(var i=0;i < categories.length;i++) {%>
+                    <option value="<%=categories[i]._id%>"><%=categories[i].name%></option>
+                    <% }%>
+                </select>
+            </div>
+            <textarea class="textContents" id="addContents" name="addContents" rows="20" cols="80"></textarea>
+        </form>
+        <div id="new" class="addBtngroup">
+            <button onclick="submitContents('add');">
+                <div>SUBMIT</div>
+            </button>
+            <button onclick="cancelWriteForm('cancel');">
+                <div>CANCEL</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    function search() {
+        if ($('#searchText').val() == '') {	
+            alert('검색어를 입력하세요.');
+            return;
+        } else {
+            $('#searchAction').submit();
+        }
+    }
+
+    function submitContents(option) {
+        var title = $('#addContentSubject').val();
+        var content = $('#addContents').val();
+        var writer = $('#addContentWriter').val();
+        var password = $('#addContentPassword').val();
+
+        if (option == 'add') {
+            if (title == '' || content == '' || writer == '' || password == '') {
+                alert("제목, 내용, 작성자, 비밀번호 모두 입력하세요.");
+                return;
+            } else {
+                $('#writeAction').submit();
+            }
+        }
+    }
+
+    function cancelWriteForm(option) {
+        if (option == 'cancel') {
+            $('#addContentSubject').val('');
+            $('#addContents').val('');
+            $('#addContentWriter').val('');
+            $('#addContentPassword').val('');
+
+            $('.write_form').hide();
+        }
+    }
+
+    function displayWriteForm() {
+        $('.write_form').show();
+    }
+    </script>
+</body>
+
+</html>
+<%
+function dateFormatChange(date) {
+var yyyy = date.getFullYear();
+var MM = date.getMonth()+1;
+var dd = date.getDate();
+
+return yyyy+"."+MM+"."+dd;
+}
+%>

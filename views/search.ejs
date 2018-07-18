@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>검색 결과</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>검색 결과</h1>
+    <table>
+        <tr>
+            <th>NO.</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성 날짜</th>
+            <th>조회수</th>
+        </tr>
+        
+            <% if(contents.length>0) { %>
+        <% var i=0; %>
+        <% contents.forEach(function(item) { %>
+        <% i++; %>
+        <tr>
+            <td>
+                <%=i%>
+            </td>
+            <td>
+                <a href="/boards/view?id=<%=item._id%>&search=1"><%=item.title%></a>
+            </td>
+            <td>
+                <%=item.writer%>
+            </td>
+            <td>
+                <%=dateFormatChange(item.date)%>
+            </td>
+            <td>
+                <%=item.count%>
+            </td>
+            <% }) } else {%>
+            검색결과가 없습니다.
+            <% } %>
+        </tr>
+    </table>
+    <a href="/boards">목록으로~</a>
+</body>
+</html>
+
+<%
+function dateFormatChange(date) {
+var options = {
+weekday:"short", year:"numeric", month:"short",
+day:"numeric", hour:"2-digit", minute:"2-digit"
+};
+
+return date.toLocaleTimeString("ko-KR", options);
+}
+%>
